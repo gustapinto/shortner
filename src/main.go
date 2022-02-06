@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"shortner/src/controller"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,17 +10,12 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.LoadHTMLGlob("./views/*")
+	sc := controller.NewShortnerController()
 
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
-	})
-	router.GET("/short", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "create.tmpl", gin.H{})
-	})
-	router.GET("/list", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "list.tmpl", gin.H{})
-	})
+	router.LoadHTMLGlob("./views/*")
+	router.GET("/", sc.Index)
+	router.GET("/short", sc.Create)
+	router.GET("/list", sc.List)
 
 	if err := router.Run("0.0.0.0:80"); err != nil {
 		log.Fatalf("Failed to start gin server, got error %+v", err)
