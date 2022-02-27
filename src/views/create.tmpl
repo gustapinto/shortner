@@ -11,13 +11,37 @@
     Url Shortner
   </h1>
   <div>
-    <form>
-      <input type="text" placeholder="URl">
+    <form id="form-shortner">
+      <input id="url" type="text" placeholder="URl">
 
       <button type="submit">
         Send
       </button>
     </form>
+
+    <p id="msg"></p>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="text/javascript">
+    const form = document.getElementById('form-shortner')
+
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+
+      const urlToShort = document.getElementById('url').value
+      const data = { url: urlToShort }
+
+      axios.post('/api/urls', data)
+        .then(response => {
+          const p = document.getElementById('msg')
+
+          p.innerHTML = `Shortned url: <a href=${response.data.newUrl}>${response.data.newUrl}</a>`
+        })
+        .catch(error => {
+          alert('Error: ' + error.response.data.error)
+        })
+    })
+  </script>
 </body>
 </html>
