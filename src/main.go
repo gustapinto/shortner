@@ -18,6 +18,9 @@ func main() {
 	router.GET("/list", sc.List)
 
 	router.POST("/api/urls", sc.ShortUrl)
+	router.GET("/api/urls", sc.GetUrls)
+
+	router.GET("/r/:id", sc.Redirect)
 
 	if err := router.Run("0.0.0.0:80"); err != nil {
 		log.Fatalf("Failed to start gin server, got error %+v", err)

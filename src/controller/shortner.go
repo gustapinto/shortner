@@ -61,16 +61,24 @@ func (c *ShortnerController) ShortUrl(ctx *gin.Context) {
 	})
 }
 
-func (c *ShortnerController) getRandomUrl(host string, tlsConn *tls.ConnectionState) string {
-	scheme := "http"
-	if tlsConn != nil {
-		scheme = "https"
-	}
+func (c *ShortnerController) GetUrls(ctx *gin.Context) {
+	ctx.IndentedJSON(http.StatusOK, c.urls)
+}
 
+func (c *ShortnerController) Redirect(ctx *gin.Context) {
+	scheme := c.getScheme(ctx.Request.TLS)
+	requestUrl := fmt.Sprintf("%s://%s%s", scheme, ctx.Request.Host, ctx.Request.URL.Path)
+	redirectTo := c.urls[requestUrl]
+
+	ctx.Redirect(http.StatusMovedPermanently, redirectTo)
+}
+
+func (c *ShortnerController) getRandomUrl(host string, tlsConn *tls.ConnectionState) string {
 	rand.Seed(time.Now().UnixMicro())
 	random := strconv.Itoa(rand.Intn(1000000))
+	scheme := c.getScheme(tlsConn)
 
-	shortned := fmt.Sprintf("%s://%s/%s", scheme, host, random)
+	shortned := fmt.Sprintf("%s://%s/r/%s", scheme, host, random)
 
 	for _, url := range c.urls {
 		if shortned == url {
@@ -79,4 +87,12 @@ func (c *ShortnerController) getRandomUrl(host string, tlsConn *tls.ConnectionSt
 	}
 
 	return shortned
+}
+
+func (c *ShortnerController) getScheme(tlsConn *tls.ConnectionState) string {
+	if tlsConn != nil {
+		return "https"
+	}
+
+	return "http"
 }

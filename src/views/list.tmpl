@@ -8,9 +8,31 @@
 </head>
 <body>
   <h1>
-    Url Shortner
+    Shortned urls
   </h1>
   <div>
+    <ul id="urls"></ul>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="text/javascript">
+    window.onload = _ => {
+      axios.get('/api/urls')
+        .then(response => {
+          const list = document.getElementById('urls')
+
+          for (const key in response.data) {
+            const shortnedUrl = key
+            const originalUrl = response.data[key]
+
+            list.innerHTML += `
+              <li>
+                ${originalUrl}: <a href=${shortnedUrl}>${shortnedUrl}</a>
+              </li>
+            `
+          }
+        })
+    }
+  </script>
 </body>
 </html>
